@@ -1,13 +1,12 @@
 import { Injectable } from "@nestjs/common";
+import { UsuarioEntity } from "./usuario.entity";
 
 @Injectable()
 export class UsuarioRepository {
-    private usuarios: any[] = [];
+    private usuarios: UsuarioEntity[] = [];
 
-    async salvar(usuario) {
+    async salvar(usuario: UsuarioEntity) {
         this.usuarios.push(usuario);
-        await this.sleep(5000);
-        console.log("Ok")
     }
 
     sleep(ms: number): Promise<void> {
@@ -24,5 +23,25 @@ export class UsuarioRepository {
         );
 
         return possivelUsuario !== undefined;
+    }
+
+    async atualiza(id: string, dadosParaAtualizar: Partial<UsuarioEntity>) {
+        const possivelUsuario = this.usuarios.find(
+            usuarioSalvo => usuarioSalvo.id === id
+        );
+
+        if (!possivelUsuario) {
+            throw new Error("Usuário não existe");
+        }
+
+        Object.entries(dadosParaAtualizar).forEach(([chave, valor]) => {
+            if (chave === "id") {
+                return;
+            }
+
+            possivelUsuario[chave] = valor;
+        });
+
+        return possivelUsuario;
     }
 }
